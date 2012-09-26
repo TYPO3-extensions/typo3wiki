@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2012-09-04T00:45:04Z" product-name="typo3wiki">
+		<header/>
+		<body>
+
+			<trans-unit id="tx_typo3wiki_domain_model_page">
+				<source>Page</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.page_title">
+				<source>pageTitle</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.subscriber">
+				<source>subscriber</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.revisions">
+				<source>revisions</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.main_revision">
+				<source>mainRevision</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.related_pages">
+				<source>relatedPages</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision">
+				<source>TextRevision</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision.write_date">
+				<source>writeDate</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision.unrendered_text">
+				<source>unrenderedText</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision.rendered_text">
+				<source>renderedText</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision.changes">
+				<source>changes</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision.owner">
+				<source>owner</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_typo3wiki_domain_model_user">
+				<source>User</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_typo3wiki_domain_model_category">
+				<source>Category</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_category.title">
+				<source>title</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_category.pages">
+				<source>pages</source>
+			</trans-unit>
+			
+		</body>
+	</file>
+</xliff>

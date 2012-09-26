@@ -1,0 +1,37 @@
+plugin.tx_typo3wiki {
+	view {
+		templateRootPath = {$plugin.tx_typo3wiki.view.templateRootPath}
+		partialRootPath = {$plugin.tx_typo3wiki.view.partialRootPath}
+		layoutRootPath = {$plugin.tx_typo3wiki.view.layoutRootPath}
+	}
+	persistence {
+		storagePid = {$plugin.tx_typo3wiki.persistence.storagePid}
+	}
+	features {
+		# uncomment the following line to enable the new Property Mapper.
+		# rewrittenPropertyMapper = 1
+	}
+	settings {
+    	indexPageTitle = {$plugin.tx_typo3wiki.settings.indexPageTitle}
+    }
+}
+
+plugin.tx_typo3wiki._CSS_DEFAULT_STYLE (
+	input.f3-form-error {
+		background-color:#FF9F9F;
+		border: 1px #FF0000 solid;
+	}
+
+	.tx-typo3wiki table {
+		border-collapse:separate;
+		border-spacing:10px;
+	}
+
+	.tx-typo3wiki table th {
+		font-weight:bold;
+	}
+
+	.tx-typo3wiki table td {
+		vertical-align:top;
+	}
+)

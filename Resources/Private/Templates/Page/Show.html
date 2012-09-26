@@ -1,0 +1,7 @@
+<f:layout name="Default" />
+
+<f:section name="main">
+    <h1>{page.pageTitle}</h1>
+    <div class="edit"><f:link.action action="edit" arguments="{page: page}">edit</f:link.action></div>
+    <div class="content"><f:format.raw>{page.mainRevision.renderedText}</f:format.raw></div>
+</f:section>

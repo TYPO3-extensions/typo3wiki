@@ -1,0 +1,14 @@
+<f:if condition="{entry}">
+    <ol>
+        <f:for each="{entry}" as="child" key="title">
+            <li>
+                {title}
+                <f:if condition="{child}">
+                    <f:then>
+                        <f:render partial="Rendering/TableOfContentsChildren" arguments="{entry: child}" />
+                    </f:then>
+                </f:if>
+            </li>
+        </f:for>
+    </ol>
+</f:if>

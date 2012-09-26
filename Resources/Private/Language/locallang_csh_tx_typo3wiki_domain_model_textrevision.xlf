@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2012-09-11T00:45:11Z" product-name="typo3wiki">
+		<header/>
+		<body>
+
+			<trans-unit id="write_date.description">
+				<source>writeDate</source>
+			</trans-unit>
+			<trans-unit id="unrendered_text.description">
+				<source>unrenderedText</source>
+			</trans-unit>
+			<trans-unit id="rendered_text.description">
+				<source>renderedText</source>
+			</trans-unit>
+			<trans-unit id="changes.description">
+				<source>changes</source>
+			</trans-unit>
+			<trans-unit id="owner.description">
+				<source>owner</source>
+			</trans-unit>
+		</body>
+	</file>
+</xliff>

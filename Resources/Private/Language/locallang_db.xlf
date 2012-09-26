@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<xliff version="1.0">
+	<file source-language="en" datatype="plaintext" original="messages" date="2012-09-11T00:45:11Z" product-name="typo3wiki">
+		<header/>
+		<body>
+
+			<trans-unit id="tx_typo3wiki_domain_model_page">
+				<source>Page</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.page_title">
+				<source>Page Title</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.subscriber">
+				<source>Subscriber</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.revisions">
+				<source>Revisions</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.main_revision">
+				<source>Main Revision</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.related_pages">
+				<source>Related Pages</source>
+			</trans-unit>
+
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision">
+				<source>Text Revision</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision.write_date">
+				<source>Write Date</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision.unrendered_text">
+				<source>Unrendered Text</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision.rendered_text">
+				<source>Rendered Text</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision.changes">
+				<source>Changes</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_textrevision.owner">
+				<source>Owner</source>
+			</trans-unit>
+
+			<trans-unit id="tx_typo3wiki_domain_model_user">
+				<source>User</source>
+			</trans-unit>
+			
+			<trans-unit id="fe_users.tx_extbase_type.Tx_Typo3wiki_User">
+				<source>TYPO3 Wiki User</source>
+			</trans-unit>
+			
+			<trans-unit id="tx_typo3wiki_domain_model_category">
+				<source>Category</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_category.title">
+				<source>Title</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_category.pages">
+				<source>Pages</source>
+			</trans-unit>
+
+		</body>
+	</file>
+</xliff>
