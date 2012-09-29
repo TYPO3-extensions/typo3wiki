@@ -71,8 +71,19 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	public function showAction(Tx_Typo3wiki_Domain_Model_Page $page = NULL) {
 		if($page === NULL ) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		if($page === NULL || $page->getMainRevision() === NULL){
-			$this->redirect('unknownPage', NULL, NULL, array('page' => $this->request->getArgument('page')));
+			if($page === NULL ){
+				$this->request->getArgument('page');
+			}else{
+				$target = $page->getPageTitle();
+			}
+			$this->redirect('unknownPage', NULL, NULL, array('page' => $target));
 		}
+		$redirection = NULL;
+		try{
+			$redirection = $this->request->getArgument('redirection');
+		}catch(Exception $e){}
+		if($page->getRedirection() != NULL) $this->redirect('show', NULL, NULL, array('page' => $page->getRedirection(), 'redirection' => $page->getPageTitle()));
+		$this->view->assign('redirection', $redirection);
 		$this->view->assign('page', $page);
 	}
 
@@ -123,9 +134,21 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 
 		$revision = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_TextRevision');
 		$revision->setUnrenderedText($text);
+		$revision->setWriteDate(new DateTime('NOW'));
 		$revision->setRenderedText($renderHelper->renderText($revision->getUnrenderedText()));
-		//echo $revision->getRenderedText(); die();
 
+		$redirection = preg_match('/\[\[REDIRECT:(.*)\]\]/i', $text, $matches);
+		if($redirection === 1){
+			$redirectionPage = $this->pageRepository->findOneByPageTitle($matches[1]);
+			if($redirectionPage === NULL){
+				$redirectionPage = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_Page');
+				$redirectionPage->setPageTitle($matches[1]);
+				$this->pageRepository->add($redirectionPage);
+			}
+			$page->setRedirection($redirectionPage);
+		}else{
+			$page->removeRedirection();
+		}
 		if($page->getMainRevision() === NULL) $renderHelper->renderRelatedPages($page);
 		$page->addRevision($revision);
 		$page->setMainRevision($revision);

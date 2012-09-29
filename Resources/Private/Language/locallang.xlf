@@ -55,7 +55,11 @@
 			<trans-unit id="tx_typo3wiki_domain_model_category.pages">
 				<source>pages</source>
 			</trans-unit>
-			
+
+			<trans-unit id="tx_typo3wiki_fluid.redirected_from">
+            	<source>Redirected from</source>
+            </trans-unit>
+
 		</body>
 	</file>
 </xliff>

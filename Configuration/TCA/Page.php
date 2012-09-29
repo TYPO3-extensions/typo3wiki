@@ -6,10 +6,10 @@ if (!defined ('TYPO3_MODE')) {
 $TCA['tx_typo3wiki_domain_model_page'] = array(
 	'ctrl' => $TCA['tx_typo3wiki_domain_model_page']['ctrl'],
 	'interface' => array(
-		'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, page_title, subscriber, revisions, main_revision, related_pages',
+		'showRecordFieldList' => 'sys_language_uid, l10n_parent, l10n_diffsource, hidden, page_title, subscriber, redirection, related_pages, main_revision, revisions',
 	),
 	'types' => array(
-		'1' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1, page_title, subscriber, revisions, main_revision, related_pages,--div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access,starttime, endtime'),
+		'1' => array('showitem' => 'sys_language_uid;;;;1-1-1, l10n_parent, l10n_diffsource, hidden;;1, page_title, subscriber, redirection, related_pages, --div--;LLL:EXT:typo3wiki/Resources/Private/Language/locallang_db.xlf:tx_typo3wiki_domain_model_page.revisions, main_revision, revisions, --div--;LLL:EXT:cms/locallang_ttc.xlf:tabs.access,starttime, endtime'),
 	),
 	'palettes' => array(
 		'1' => array('showitem' => ''),
@@ -161,6 +161,23 @@ $TCA['tx_typo3wiki_domain_model_page'] = array(
 			'config' => array(
 				'type' => 'inline',
 				'foreign_table' => 'tx_typo3wiki_domain_model_textrevision',
+				'minitems' => 0,
+				'maxitems' => 1,
+				'appearance' => array(
+					'collapseAll' => 0,
+					'levelLinksPosition' => 'top',
+					'showSynchronizationLink' => 1,
+					'showPossibleLocalizationRecords' => 1,
+					'showAllLocalizationLink' => 1
+				),
+			),
+		),
+		'redirection' => array(
+			'exclude' => 0,
+			'label' => 'LLL:EXT:typo3wiki/Resources/Private/Language/locallang_db.xlf:tx_typo3wiki_domain_model_page.redirection',
+			'config' => array(
+				'type' => 'inline',
+				'foreign_table' => 'tx_typo3wiki_domain_model_page',
 				'minitems' => 0,
 				'maxitems' => 1,
 				'appearance' => array(

@@ -11,6 +11,7 @@ CREATE TABLE tx_typo3wiki_domain_model_page (
 	revisions int(11) unsigned DEFAULT '0' NOT NULL,
 	main_revision int(11) unsigned DEFAULT '0',
 	related_pages int(11) unsigned DEFAULT '0' NOT NULL,
+	redirection int(11) unsigned DEFAULT '0',
 
 	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
 	crdate int(11) unsigned DEFAULT '0' NOT NULL,

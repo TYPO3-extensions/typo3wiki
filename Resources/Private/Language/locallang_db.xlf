@@ -22,6 +22,9 @@
 			<trans-unit id="tx_typo3wiki_domain_model_page.related_pages">
 				<source>Related Pages</source>
 			</trans-unit>
+			<trans-unit id="tx_typo3wiki_domain_model_page.redirection">
+            	<source>Redirection</source>
+            </trans-unit>
 
 			<trans-unit id="tx_typo3wiki_domain_model_textrevision">
 				<source>Text Revision</source>

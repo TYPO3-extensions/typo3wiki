@@ -74,6 +74,13 @@ class Tx_Typo3wiki_Domain_Model_Page extends Tx_Extbase_DomainObject_AbstractEnt
 	protected $relatedPages;
 
 	/**
+	 * Redirections PageName
+	 *
+	 * @var Tx_Typo3wiki_Domain_Model_Page
+	 */
+	protected $redirection;
+
+	/**
 	 * __construct
 	 *
 	 * @return void
@@ -255,6 +262,32 @@ class Tx_Typo3wiki_Domain_Model_Page extends Tx_Extbase_DomainObject_AbstractEnt
 	public function setRelatedPages(Tx_Extbase_Persistence_ObjectStorage $relatedPages) {
 		$this->relatedPages = $relatedPages;
 	}
+
+	/**
+	 * Set Redirection
+	 *
+	 * @param Tx_Typo3wiki_Domain_Model_Page $redirection
+	 */
+	public function setRedirection(Tx_Typo3wiki_Domain_Model_Page $redirection) {
+		$this->redirection = $redirection;
+	}
+
+	/**
+	 * Get Redirection
+	 *
+	 * @return Tx_Typo3wiki_Domain_Model_Page
+	 */
+	public function getRedirection() {
+		return $this->redirection;
+	}
+
+	/**
+	 *  Remove the Redirection
+	 */
+	public function removeRedirection() {
+		$this->redirection = NULL;
+	}
+
 
 }
 ?>
