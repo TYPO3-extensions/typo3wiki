@@ -63,6 +63,10 @@
 				<source>Pages</source>
 			</trans-unit>
 
+
+			<trans-unit id="tx_typo3wiki_backend.cacheMenu">
+				<source>Empty Wiki Cache</source>
+			</trans-unit>
 		</body>
 	</file>
 </xliff>

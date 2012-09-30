@@ -82,6 +82,10 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 			$redirection = $this->request->getArgument('redirection');
 		}catch(Exception $e){}
 		if($page->getRedirection() != NULL) $this->redirect('show', NULL, NULL, array('page' => $page->getRedirection(), 'redirection' => $page->getPageTitle()));
+		if($page->getMainRevision()->getRenderedText() === ''){
+			$renderHelper = $this->createRenderHelper();
+			$page->getMainRevision()->setRenderedText($renderHelper->renderText($page->getMainRevision()->getUnrenderedText()));
+		}
 		$this->view->assign('redirection', $redirection);
 		$this->view->assign('page', $page);
 	}
@@ -124,12 +128,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	public function updateAction(Tx_Typo3wiki_Domain_Model_Page $page) {
 		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		$text = $this->request->getArgument('text') ;
-
-		$renderHelper = $this->objectManager->get('Tx_Typo3wiki_Helper_RenderHelper');
-		$renderHelper->setPageRepository($this->pageRepository);
-		$renderHelper->setUriBuilder($this->uriBuilder);
-		$renderHelper->setSettings($this->settings);
-		$renderHelper->setObjectManager($this->objectManager);
+		$renderHelper = $this->createRenderHelper();
 
 		$revision = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_TextRevision');
 		$revision->setUnrenderedText($text);
@@ -153,6 +152,21 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 		$page->setMainRevision($revision);
 		$this->pageRepository->update($page);
 		$this->redirect('show', NULL, NULL, array('page' => $page));
+	}
+
+	/**
+	 * Creates a RenderHelper
+	 *
+	 * @return Tx_Typo3wiki_Helper_RenderHelper
+	 */
+	private function createRenderHelper(){
+		$renderHelper = $this->objectManager->get('Tx_Typo3wiki_Helper_RenderHelper');
+		$renderHelper->setPageRepository($this->pageRepository);
+		$renderHelper->setUriBuilder($this->uriBuilder);
+		$renderHelper->setSettings($this->settings);
+		$renderHelper->setObjectManager($this->objectManager);
+
+		return $renderHelper;
 	}
 
 }
