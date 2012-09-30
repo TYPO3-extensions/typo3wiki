@@ -97,8 +97,8 @@
 		 */
 		public function renderText($text) {
 			$text = $this->transform($text);
-			$text = $this->_renderInternalLinks($text);
 			$text = $this->_renderExternalLinks($text);
+			$text = $this->_renderInternalLinks($text);
 			$text = $this->_renderHeadlineLinks($text);
 			$text = $this->_renderContentList($text);
 			return $text;
@@ -150,14 +150,18 @@
 				if(count($linkTitle)==2){
 					$link = $this->uriBuilder->setArguments(array('tx_typo3wiki_typo3wiki[action]' => 'show', 'tx_typo3wiki_typo3wiki[page]' => $linkTitle[1]));
 					$link = $link->build();
-					// @todo check if createdPage exists
-					$link = '<a href="'.$link.'">'.$linkTitle[0].'</a>';
+					$cssClass = 'internal exists';
+					$target = $this->pageRepository->findOneByPageTitle($linkTitle[1]);
+					if($target === NULL) $cssClass = 'internal nonexists';
+					$link = '<a href="'.$link.'" class="'.$cssClass.'">'.$linkTitle[0].'</a>';
 					$text = str_replace('[['.$linkTitle[0].'|'.$linkTitle[1].']]', $link, $text);
 				}else{
 					$link = $this->uriBuilder->setArguments(array('tx_typo3wiki_typo3wiki[action]' => 'show', 'tx_typo3wiki_typo3wiki[page]' => $linkTitle[0]));
 					$link = $link->build();
-					// @todo check if createdPage exists
-					$link = '<a href="'.$link.'">'.$linkTitle[0].'</a>';
+					$cssClass = 'internal exists';
+					$target = $this->pageRepository->findOneByPageTitle($linkTitle[0]);
+					if($target === NULL) $cssClass = 'internal nonexists';
+					$link = '<a href="'.$link.'" class="'.$cssClass.'">'.$linkTitle[0].'</a>';
 					$text = str_replace('[['.$linkTitle[0].']]', $link, $text);
 				}
 
@@ -167,17 +171,18 @@
 		}
 
 		/**
-		 * @todo Adds the rendering of externalLinks to MarkUp
+		 * Adds the rendering of externalLinks to MarkUp
 		 *
 		 * @param string $text
 		 * @return string
 		 */
 		private function _renderExternalLinks($text) {
+			$text = preg_replace('/<a href="(.*)"/', '$0 class="external" ', $text);
 			return $text;
 		}
 
 		/**
-		 * @todo Adds the rendering of ContentList based on HeadLines to MarkUp
+		 * Adds the rendering of ContentList based on HeadLines to MarkUp
 		 * @todo Make TOC Template Movable
 		 *
 		 * @param string $text
