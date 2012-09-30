@@ -3,7 +3,6 @@
 <f:section name="main">
     <h1>{page.pageTitle}</h1>
     <f:if condition="{redirection}">
-        <!-- TODO Translation Key-->
         <div class="redirected">
             <f:translate key="LLL:EXT:typo3wiki/Resources/Private/Language/locallang.xlf:tx_typo3wiki_fluid.redirected_from">Redirected from1</f:translate>
             <f:link.action action="show" arguments="{page: redirection}">{redirection}</f:link.action>

@@ -31,7 +31,6 @@
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  *
  */
-// @todo Make preview Possible ( AJAX? )
 // @todo implement User to System
 class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_ActionController {
 

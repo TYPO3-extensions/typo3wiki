@@ -2,7 +2,7 @@
     <ol>
         <f:for each="{entry}" as="child" key="title">
             <li>
-                {title}
+                <f:format.raw>{title}</f:format.raw>
                 <f:if condition="{child}">
                     <f:then>
                         <f:render partial="Rendering/TableOfContentsChildren" arguments="{entry: child}" />

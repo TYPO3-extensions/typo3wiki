@@ -83,6 +83,13 @@
 		protected $objectManager;
 
 		/**
+		 * A Helper Variable should be NULL after each method.
+		 *
+		 * @var null
+		 */
+		protected $helper = NULL;
+
+		/**
 		 * Rendering Method to render TextRevision
 		 *
 		 * @param string $text
@@ -92,13 +99,13 @@
 			$text = $this->transform($text);
 			$text = $this->_renderInternalLinks($text);
 			$text = $this->_renderExternalLinks($text);
+			$text = $this->_renderHeadlineLinks($text);
 			$text = $this->_renderContentList($text);
 			return $text;
 		}
 
 		/**
 		 * Render Related Pages, if current pages is new created
-		 * @todo Currently only mainTextRevision used
 		 *
 		 * @param Tx_Typo3wiki_Domain_Model_Page $page
 		 * @return void
@@ -138,7 +145,6 @@
 		private function _renderInternalLinks($text) {
 			$tmp = array();
 			preg_match_all('#\[\[([^\]]*)\]\]#u', $text, $tmp);
-			//[[Name|Seite]]
 			foreach($tmp[1] as $linkTitle){
 				$linkTitle = explode('|', $linkTitle);
 				if(count($linkTitle)==2){
@@ -206,6 +212,30 @@
 				$returnArray[$tmp[1][$i]] = $this->_getContentListStage($tmp[2][$i], $stage+1);
 			}
 			return $returnArray;
+		}
+
+		private function _renderHeadlineLinks($text){
+			$this->helper = array();
+			$text = preg_replace_callback('/<h.>(.*)<\/h.>/', array( $this, '_renderHeadlineLinksCall'), $text);
+			$this->helper = NULL;
+			return $text;
+		}
+
+		private function _renderHeadlineLinksCall($header){
+			preg_match('/<h(.)>/', $header[0], $match);
+			$level = $match[1];
+			$header = $header[1];
+			$header = trim($header);
+			$shortTag = str_replace(' ', '_', $header);
+			$shortTag = str_replace('#', '_', $shortTag);
+			if(isset($this->helper[$header])){
+				$this->helper[$header]++;
+				$shortTag.= $this->helper[$header];
+			}else{
+				$this->helper[$header] = 0;
+			}
+			$header = '<a name="'.$shortTag.'"></a><h'.$level.'><a href="#'.$shortTag.'">'.$header.'</a></h'.$level.'>';
+			return $header;
 		}
 
 		/**
