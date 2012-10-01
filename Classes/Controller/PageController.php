@@ -68,6 +68,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 * @return void
 	 */
 	public function showAction(Tx_Typo3wiki_Domain_Model_Page $page = NULL) {
+		$settings = $this->configurationManager->getConfiguration(Tx_Extbase_Configuration_ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);
 		if($page === NULL ) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		if($page === NULL || $page->getMainRevision() === NULL){
 			if($page === NULL ){
@@ -164,6 +165,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 		$renderHelper->setPageRepository($this->pageRepository);
 		$renderHelper->setUriBuilder($this->uriBuilder);
 		$renderHelper->setSettings($this->settings);
+		$renderHelper->setObjectSettings($this->configurationManager->getConfiguration(Tx_Extbase_Configuration_ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK));
 		$renderHelper->setObjectManager($this->objectManager);
 
 		return $renderHelper;

@@ -30,7 +30,6 @@
 	 * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
 	 *
 	 */
-	// @todo  check if __DIR__ has ending slash
 	require(__DIR__ . '/markdown.php');
 	class Tx_Typo3wiki_Helper_RenderHelper extends MarkdownExtra_Parser {
 		/**
@@ -76,6 +75,13 @@
 		protected $settings;
 
 		/**
+		 * The Controllers Object Settings
+		 *
+		 * @var array
+		 */
+		protected $objectSettings;
+
+		/**
 		 * The ObjectManager
 		 *
 		 * @var Tx_Extbase_Object_ObjectManagerInterface
@@ -112,9 +118,9 @@
 		 */
 		public function renderRelatedPages(Tx_Typo3wiki_Domain_Model_Page $page) {
 			foreach ($page->getRelatedPages() as $singlePage) {
-				$text = $singlePage->getMainRevision()->getRenderedText();
-				$text = $this->renderRelatedPagesHelper($text, $page);
-				$singlePage->getMainRevision()->setRenderedText($text);
+				$singlePage->getMainRevision()->setRenderedText('');
+				/*$text = $this->renderRelatedPagesHelper($text, $page);
+				$singlePage->getMainRevision()->setRenderedText($text); */
 				// @todo check is is saved
 			}
 		}
@@ -136,8 +142,7 @@
 		}
 
 		/**
-		 * @todo Adds the rendering of internalLinks to MarkUp
-		 * @todo tx_typo3wiki_typo3wiki automatically?
+		 * Adds the rendering of internalLinks to MarkUp
 		 *
 		 * @param string $text
 		 * @return string
@@ -183,7 +188,6 @@
 
 		/**
 		 * Adds the rendering of ContentList based on HeadLines to MarkUp
-		 * @todo Make TOC Template Movable
 		 *
 		 * @param string $text
 		 * @return string
@@ -193,11 +197,9 @@
 			$stageList = $this->_getContentListStage($text, 1);
 			$tocView = $this->objectManager->create('Tx_Fluid_View_StandaloneView');
 			$tocView->setFormat('html');
-			$tocView->setLayoutRootPath('typo3conf/ext/typo3wiki/Resources/Private/Layouts');
-			$tocView->setPartialRootPath('typo3conf/ext/typo3wiki/Resources/Private/Partials');
-			$templateRootPath = t3lib_div::getFileAbsFileName( 'typo3conf/ext/typo3wiki/Resources/Private/Templates/Rendering/' );
-			$templatePathAndFilename = $templateRootPath .'TableOfContents.html';
-			$tocView->setTemplatePathAndFilename($templatePathAndFilename);
+			$tocView->setLayoutRootPath(t3lib_div::getFileAbsFileName($this->objectSettings['view']['layoutRootPath']));
+			$tocView->setPartialRootPath(t3lib_div::getFileAbsFileName($this->objectSettings['view']['partialRootPath']));
+			$tocView->setTemplatePathAndFilename(t3lib_div::getFileAbsFileName($this->objectSettings['view']['templateRootPath']).'Rendering/TableOfContents.html');
 			$tocView->assign('stageList', $stageList);
 			return str_replace('{TOC}', $tocView->render(), $text);
 		}
@@ -296,6 +298,25 @@
 		public function getSettings() {
 			return $this->settings;
 		}
+
+		/**
+		 * Set objectSettings
+		 *
+		 * @param array $objectSettings
+		 */
+		public function setObjectSettings($objectSettings) {
+			$this->objectSettings = $objectSettings;
+		}
+
+		/**
+		 * Get objectSettings
+		 *
+		 * @return array
+		 */
+		public function getObjectSettings() {
+			return $this->objectSettings;
+		}
+
 
 		/**
 		 * Set ObjectManager
