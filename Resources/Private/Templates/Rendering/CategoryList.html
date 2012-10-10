@@ -1,0 +1,18 @@
+<f:if condition="{pages}">
+    <f:then>
+        <div class="categoryPageList">
+            <ul>
+                <f:for each="{pages}" as="child" key="title">
+                    <f:if condition="{child}">
+                        <f:then>
+                            <li>[[{child.pageTitle}]]</li>
+                        </f:then>
+                    </f:if>
+                </f:for>
+            </ul>
+        </div>
+    </f:then>
+    <f:else>
+         No List Elements
+    </f:else>
+</f:if>

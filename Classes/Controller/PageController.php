@@ -84,7 +84,11 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 		}catch(Exception $e){}
 		if($page->getRedirection() != NULL) $this->redirect('show', NULL, NULL, array('page' => $page->getRedirection(), 'redirection' => $page->getPageTitle()));
 		if($page->getMainRevision()->getRenderedText() === ''){
+			if($page->getIsCategory() === true){
+				$page = $this->checkCategoryAssociation($page);
+			}
 			$renderHelper = $this->createRenderHelper();
+			$renderHelper->setRelatedPage($page);
 			$page->getMainRevision()->setRenderedText($renderHelper->renderText($page->getMainRevision()->getUnrenderedText()));
 		}
 		$this->view->assign('redirection', $redirection);
@@ -129,12 +133,11 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	public function updateAction(Tx_Typo3wiki_Domain_Model_Page $page) {
 		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		$text = $this->request->getArgument('text') ;
-		$renderHelper = $this->createRenderHelper();
 
 		$revision = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_TextRevision');
 		$revision->setUnrenderedText($text);
 		$revision->setWriteDate(new DateTime('NOW'));
-		$revision->setRenderedText($renderHelper->renderText($revision->getUnrenderedText()));
+		$revision->setRenderedText('');
 
 		$redirection = preg_match('/\[\[REDIRECT:(.*)\]\]/i', $text, $matches);
 		if($redirection === 1){
@@ -148,7 +151,16 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 		}else{
 			$page->removeRedirection();
 		}
-		if($page->getMainRevision() === NULL) $renderHelper->renderRelatedPages($page);
+		/**
+		 * Clear Cache of related Pages
+		 * eg Link Generation
+		 * eg Category Generation
+		 */
+		$renderHelper = $this->createRenderHelper();
+		$renderHelper->setRelatedPage($page);
+		if($page->getMainRevision() === NULL) $renderHelper->renderRelatedPages($text);
+		$tmp = str_replace('{TOC}', '', $text);
+		if(preg_match('/{.*?}/', $tmp) === 1) $renderHelper->renderCategoryPages($text);
 		$page->addRevision($revision);
 		$page->setMainRevision($revision);
 		$this->pageRepository->update($page);
@@ -169,6 +181,22 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 		$renderHelper->setObjectManager($this->objectManager);
 
 		return $renderHelper;
+	}
+
+	/**
+	 * Checks if the current Page is still a Category Page and removes unused Relations
+	 *
+	 * @param Tx_Typo3wiki_Domain_Model_Page $page The CategoryPage
+	 * @return Tx_Typo3wiki_Domain_Model_Page
+	 */
+	private function checkCategoryAssociation(Tx_Typo3wiki_Domain_Model_Page $page){
+		foreach($page->getCategoryPages() as $catPage){
+			if($catPage->getMainRevision() !== NULL && FALSE === strpos($catPage->getMainRevision()->getUnrenderedText(),'{'.$page->getPageTitle().'}')){
+				$page->removeCategoryPage($catPage);
+			}
+		}
+		$page->setIsCategory(($page->getCategoryPages()->count() !== 0));
+		return $page;
 	}
 
 }

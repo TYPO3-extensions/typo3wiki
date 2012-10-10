@@ -30,8 +30,29 @@
 	 * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
 	 *
 	 */
+	// @todo order Methods
 	require(__DIR__ . '/markdown.php');
 	class Tx_Typo3wiki_Helper_RenderHelper extends MarkdownExtra_Parser {
+
+		/**
+		 * Method for getting a PageObject by Title. If Object does not exists, it will be created.
+		 *
+		 * @param string $title
+		 * @return Tx_Typo3wiki_Domain_Model_Page
+		 */
+		private function createPageIfNotExists($title){
+			$returnPage = $this->pageRepository->findOneByPageTitle($title);
+			if($returnPage === NULL){
+				$returnPage = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_Page');
+				$returnPage->setPageTitle($title);
+				$this->pageRepository->add($returnPage);
+				$persistenceManager = t3lib_div::makeInstance('Tx_Extbase_Persistence_Manager');
+				$persistenceManager->persistAll();
+			}
+			return $returnPage;
+
+		}
+
 		/**
 		 * relatedPageSearch
 		 *
@@ -91,9 +112,16 @@
 		/**
 		 * A Helper Variable should be NULL after each method.
 		 *
-		 * @var null
+		 * @var $helper NULL
 		 */
 		protected $helper = NULL;
+
+		/**
+		 * The RelatedPage
+		 *
+		 * @var $relatedPage Tx_Typo3wiki_Domain_Model_Page
+		 */
+		protected $relatedPage;
 
 		/**
 		 * Rendering Method to render TextRevision
@@ -103,6 +131,8 @@
 		 */
 		public function renderText($text) {
 			$text = $this->transform($text);
+			$text = $this->_renderCategories($text);
+			$text = $this->_renderCategoriesList($text);
 			$text = $this->_renderExternalLinks($text);
 			$text = $this->_renderInternalLinks($text);
 			$text = $this->_renderHeadlineLinks($text);
@@ -111,35 +141,55 @@
 		}
 
 		/**
-		 * Render Related Pages, if current pages is new created
+		 * Removes Cache of Related Categories; Fired on update
 		 *
 		 * @param Tx_Typo3wiki_Domain_Model_Page $page
+		 * @param string $text
 		 * @return void
 		 */
-		public function renderRelatedPages(Tx_Typo3wiki_Domain_Model_Page $page) {
-			foreach ($page->getRelatedPages() as $singlePage) {
-				$singlePage->getMainRevision()->setRenderedText('');
-				/*$text = $this->renderRelatedPagesHelper($text, $page);
-				$singlePage->getMainRevision()->setRenderedText($text); */
-				// @todo check is is saved
-			}
+		public function renderCategoryPages($text) {
+			$text = str_replace('{TOC}', '', $text);
+			$text = str_replace('{LOC}', '', $text);
+			$this->helper = array();
+			$text = preg_replace_callback('/{(.*?)}/', array( $this, '_renderCategoryPagesHelper'), $text);
+			$this->helper = NULL;
 		}
 
 		/**
-		 * Removes unused class out of anchors with current page as target
-		 * @todo write RenderRelatedPagesHelper Method
+		 * Helper Method for: Removes Cache of Related Categories; Fired on update
+		 * Adds this page to all relatedCategoryPages
 		 *
-		 * @param string $text
+		 * @param $cat PageMatching
+		 * @return mixed
+		 */
+		private function _renderCategoryPagesHelper($cat){
+			$cat = $cat[1];
+			if($cat === 'TOC') return '';
+			if($cat === 'LOC') return '';
+			if(!isset($this->helper[$cat])){
+				$catPage = $this->createPageIfNotExists($cat);
+				if(!$catPage->getCategoryPages()->contains($this->relatedPage)){
+					$catPage->addCategoryPage($this->relatedPage);
+					$catPage->setIsCategory(true);
+				}
+				$this->helper[$cat] = TRUE;
+			}
+			return '';
+		}
+
+		/**
+		 * Removes Cache of Related Pages, if current pages is new created
+		 *
+		 *
 		 * @param Tx_Typo3wiki_Domain_Model_Page $page
 		 * @return void
 		 */
-		private function renderRelatedPagesHelper($text, Tx_Typo3wiki_Domain_Model_Page $page) {
-			if ($this->relatedPageSearch === NULL || $this->relatedPageReplace === NULL) {
-				$this->relatedPageSearch = '';
-				$this->relatedPageReplace = '';
+		public function renderRelatedPages() {
+			foreach($this->relatedPage->getRelatedPages() as $related){
+				$related->getMainRevision()->setRenderedText('');
 			}
-			return str_replace($this->relatedPageSearch, $this->relatedPageReplace, $text);
 		}
+
 
 		/**
 		 * Adds the rendering of internalLinks to MarkUp
@@ -148,6 +198,7 @@
 		 * @return string
 		 */
 		private function _renderInternalLinks($text) {
+			$this->helper = array();
 			$tmp = array();
 			preg_match_all('#\[\[([^\]]*)\]\]#u', $text, $tmp);
 			foreach($tmp[1] as $linkTitle){
@@ -156,22 +207,40 @@
 					$link = $this->uriBuilder->setArguments(array('tx_typo3wiki_typo3wiki[action]' => 'show', 'tx_typo3wiki_typo3wiki[page]' => $linkTitle[1]));
 					$link = $link->build();
 					$cssClass = 'internal exists';
-					$target = $this->pageRepository->findOneByPageTitle($linkTitle[1]);
-					if($target === NULL) $cssClass = 'internal nonexists';
+					if(!isset($this->helper[$linkTitle[1]])){
+						$target = $this->createPageIfNotExists($linkTitle[1]);
+						$this->helper[$linkTitle[1]] = $target;
+					}else{
+						$target = $this->helper[$linkTitle[1]];
+					}
+					if($target->getMainRevision() === NULL ) $cssClass = 'internal nonexists';
 					$link = '<a href="'.$link.'" class="'.$cssClass.'">'.$linkTitle[0].'</a>';
 					$text = str_replace('[['.$linkTitle[0].'|'.$linkTitle[1].']]', $link, $text);
 				}else{
 					$link = $this->uriBuilder->setArguments(array('tx_typo3wiki_typo3wiki[action]' => 'show', 'tx_typo3wiki_typo3wiki[page]' => $linkTitle[0]));
 					$link = $link->build();
 					$cssClass = 'internal exists';
-					$target = $this->pageRepository->findOneByPageTitle($linkTitle[0]);
-					if($target === NULL) $cssClass = 'internal nonexists';
+					if(!isset($this->helper[$linkTitle[0]])){
+						$target = $this->createPageIfNotExists($linkTitle[0]);
+						$this->helper[$linkTitle[0]] = $target;
+					}else{
+						$target = $this->helper[$linkTitle[0]];
+					}
+					if( $target->getMainRevision() === NULL ) $cssClass = 'internal nonexists';
 					$link = '<a href="'.$link.'" class="'.$cssClass.'">'.$linkTitle[0].'</a>';
 					$text = str_replace('[['.$linkTitle[0].']]', $link, $text);
 				}
 
 			}
 
+			foreach($this->helper as $relatedPage){
+				if($relatedPage->getMainRevision() === NULL){
+					if(!$relatedPage->getRelatedPages()->contains($this->relatedPage)){
+						$relatedPage->addRelatedPage($this->relatedPage);
+					}
+				}
+			}
+			$this->helper = NULL;
 			return $text;
 		}
 
@@ -195,11 +264,7 @@
 		private function _renderContentList($text) {
 			if(strpos($text, '{TOC}') === FALSE) return $text;
 			$stageList = $this->_getContentListStage($text, 1);
-			$tocView = $this->objectManager->create('Tx_Fluid_View_StandaloneView');
-			$tocView->setFormat('html');
-			$tocView->setLayoutRootPath(t3lib_div::getFileAbsFileName($this->objectSettings['view']['layoutRootPath']));
-			$tocView->setPartialRootPath(t3lib_div::getFileAbsFileName($this->objectSettings['view']['partialRootPath']));
-			$tocView->setTemplatePathAndFilename(t3lib_div::getFileAbsFileName($this->objectSettings['view']['templateRootPath']).'Rendering/TableOfContents.html');
+			$tocView = $this->createViewHelper('TableOfContents');
 			$tocView->assign('stageList', $stageList);
 			return str_replace('{TOC}', $tocView->render(), $text);
 		}
@@ -221,6 +286,12 @@
 			return $returnArray;
 		}
 
+		/**
+		 * Renders HeadLines to Links
+		 *
+		 * @param string $text
+		 * @return string
+		 */
 		private function _renderHeadlineLinks($text){
 			$this->helper = array();
 			$text = preg_replace_callback('/<h.>(.*)<\/h.>/', array( $this, '_renderHeadlineLinksCall'), $text);
@@ -228,6 +299,12 @@
 			return $text;
 		}
 
+		/**
+		 * Renders HeadLines to Links Call
+		 *
+		 * @param string $header
+		 * @return string
+		 */
 		private function _renderHeadlineLinksCall($header){
 			preg_match('/<h(.)>/', $header[0], $match);
 			$level = $match[1];
@@ -243,6 +320,71 @@
 			}
 			$header = '<a name="'.$shortTag.'"></a><h'.$level.'><a href="#'.$shortTag.'">'.$header.'</a></h'.$level.'>';
 			return $header;
+		}
+
+		/**
+		 * Renders the Categories View
+		 *
+		 * @param string $text
+		 * @return string
+		 */
+		private function _renderCategories($text){
+			$this->helper = array();
+			$text = preg_replace_callback('/{(.*?)}/', array( $this, '_renderCategoriesHelper'), $text);
+			$tocView = $this->createViewHelper('PageCategories');
+			$tocView->assign('categories', $this->helper[1]);
+
+			$helper = $tocView->render();
+			$helper = $this->_renderInternalLinks($helper);
+			$this->helper = NULL;
+			return $text.$helper;
+		}
+
+		/**
+		 * Renders the Categories View Helper
+		 *
+		 * @param string $cat
+		 * @return string $cat
+		 */
+		private function _renderCategoriesHelper($cat){
+			if($cat[0] === '{TOC}') return $cat[0];
+			if($cat[0] === '{LOC}') return $cat[0];
+			$this->helper[1][] = $cat[1];
+			$tmpPage = $this->createPageIfNotExists($cat[1]);
+			if(!$tmpPage->getCategoryPages()->contains($this->relatedPage)) $tmpPage->addCategoryPage($this->relatedPage);
+			if($tmpPage->getIsCategory() === FALSE)     $tmpPage->setIsCategory(TRUE);
+			return '';
+		}
+
+		/**
+		 * Renders the List of Pages related to this Category ( Page )
+		 *
+		 * @param string $text
+		 * @return string $text
+		 */
+		private function _renderCategoriesList($text){
+			if(strpos($text, '{LOC}') !== FALSE){
+				$tocView = $this->createViewHelper('CategoryList');
+				$tocView->assign('pages', $this->relatedPage->getCategoryPages());
+				$helper = $tocView->render();
+				$text = str_replace('{LOC}', $helper, $text);
+			}
+			return $text;
+		}
+
+		/**
+		 * Create Stand Alone Viewhelper
+		 *
+		 * @param string $templateName
+		 * @return Tx_Fluid_View_StandaloneView
+		 */
+		private function createViewHelper($templateName){
+			$tocView = $this->objectManager->create('Tx_Fluid_View_StandaloneView');
+			$tocView->setFormat('html');
+			$tocView->setLayoutRootPath(t3lib_div::getFileAbsFileName($this->objectSettings['view']['layoutRootPath']));
+			$tocView->setPartialRootPath(t3lib_div::getFileAbsFileName($this->objectSettings['view']['partialRootPath']));
+			$tocView->setTemplatePathAndFilename(t3lib_div::getFileAbsFileName($this->objectSettings['view']['templateRootPath']).'Rendering/'.$templateName.'.html');
+			return $tocView;
 		}
 
 		/**
@@ -335,5 +477,20 @@
 		public function getObjectManager() {
 			return $this->objectManager;
 		}
+
+		/**
+		 * @param Tx_Typo3wiki_Domain_Model_Page $relatedPage
+		 */
+		public function setRelatedPage($relatedPage) {
+			$this->relatedPage = $relatedPage;
+		}
+
+		/**
+		 * @return Tx_Typo3wiki_Domain_Model_Page
+		 */
+		public function getRelatedPage() {
+			return $this->relatedPage;
+		}
+
 
 	}

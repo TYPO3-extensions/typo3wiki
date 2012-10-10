@@ -102,32 +102,3 @@ $TCA['fe_users']['columns'][$TCA['fe_users']['ctrl']['type']]['config']['items']
 $TCA['fe_users']['types']['Tx_Typo3wiki_User']['showitem'] = $TCA['fe_users']['types']['Tx_Extbase_Domain_Model_FrontendUser']['showitem'];
 $TCA['fe_users']['types']['Tx_Typo3wiki_User']['showitem'] .= ',--div--;LLL:EXT:typo3wiki/Resources/Private/Language/locallang_db.xlf:tx_typo3wiki_domain_model_user,';
 $TCA['fe_users']['types']['Tx_Typo3wiki_User']['showitem'] .= '';
-
-t3lib_extMgm::addLLrefForTCAdescr('tx_typo3wiki_domain_model_category', 'EXT:typo3wiki/Resources/Private/Language/locallang_csh_tx_typo3wiki_domain_model_category.xlf');
-t3lib_extMgm::allowTableOnStandardPages('tx_typo3wiki_domain_model_category');
-$TCA['tx_typo3wiki_domain_model_category'] = array(
-	'ctrl' => array(
-		'title'	=> 'LLL:EXT:typo3wiki/Resources/Private/Language/locallang_db.xlf:tx_typo3wiki_domain_model_category',
-		'label' => 'title',
-		'tstamp' => 'tstamp',
-		'crdate' => 'crdate',
-		'cruser_id' => 'cruser_id',
-		'dividers2tabs' => TRUE,
-
-		'origUid' => 't3_origuid',
-		'languageField' => 'sys_language_uid',
-		'transOrigPointerField' => 'l10n_parent',
-		'transOrigDiffSourceField' => 'l10n_diffsource',
-		'delete' => 'deleted',
-		'enablecolumns' => array(
-			'disabled' => 'hidden',
-			'starttime' => 'starttime',
-			'endtime' => 'endtime',
-		),
-		'searchFields' => 'title,pages,',
-		'dynamicConfigFile' => t3lib_extMgm::extPath($_EXTKEY) . 'Configuration/TCA/Category.php',
-		'iconfile' => t3lib_extMgm::extRelPath($_EXTKEY) . 'Resources/Public/Icons/tx_typo3wiki_domain_model_category.gif'
-	),
-);
-
-?>

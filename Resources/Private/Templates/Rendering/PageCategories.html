@@ -1,0 +1,11 @@
+<f:if condition="{categories}">
+    <div class="categoriesList">
+        <f:for each="{categories}" as="child" key="title">
+                <f:if condition="{child}">
+                    <f:then>
+			<span>[[{child}]]</span>
+                    </f:then>
+                </f:if>
+        </f:for>
+    </div>
+</f:if>

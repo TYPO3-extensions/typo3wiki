@@ -7,10 +7,12 @@ CREATE TABLE tx_typo3wiki_domain_model_page (
 	pid int(11) DEFAULT '0' NOT NULL,
 
 	page_title varchar(255) DEFAULT '' NOT NULL,
+	is_category tinyint(4) unsigned DEFAULT '0' NOT NULL,
 	subscriber int(11) unsigned DEFAULT '0' NOT NULL,
 	revisions int(11) unsigned DEFAULT '0' NOT NULL,
 	main_revision int(11) unsigned DEFAULT '0',
 	related_pages int(11) unsigned DEFAULT '0' NOT NULL,
+	category_pages int(11) unsigned DEFAULT '0' NOT NULL,
 	redirection int(11) unsigned DEFAULT '0',
 
 	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
@@ -76,37 +78,6 @@ CREATE TABLE tx_typo3wiki_domain_model_textrevision (
 CREATE TABLE fe_users (
 
 	tx_extbase_type varchar(255) DEFAULT '' NOT NULL,
-
-);
-
-#
-# Table structure for table 'tx_typo3wiki_domain_model_category'
-#
-CREATE TABLE tx_typo3wiki_domain_model_category (
-
-	uid int(11) NOT NULL auto_increment,
-	pid int(11) DEFAULT '0' NOT NULL,
-
-	title varchar(255) DEFAULT '' NOT NULL,
-	pages int(11) unsigned DEFAULT '0' NOT NULL,
-
-	tstamp int(11) unsigned DEFAULT '0' NOT NULL,
-	crdate int(11) unsigned DEFAULT '0' NOT NULL,
-	cruser_id int(11) unsigned DEFAULT '0' NOT NULL,
-	deleted tinyint(4) unsigned DEFAULT '0' NOT NULL,
-	hidden tinyint(4) unsigned DEFAULT '0' NOT NULL,
-	starttime int(11) unsigned DEFAULT '0' NOT NULL,
-	endtime int(11) unsigned DEFAULT '0' NOT NULL,
-
-	t3_origuid int(11) DEFAULT '0' NOT NULL,
-	sys_language_uid int(11) DEFAULT '0' NOT NULL,
-	l10n_parent int(11) DEFAULT '0' NOT NULL,
-	l10n_diffsource mediumblob,
-
-	PRIMARY KEY (uid),
-	KEY parent (pid),
-
-	KEY language (l10n_parent,sys_language_uid)
 
 );
 
