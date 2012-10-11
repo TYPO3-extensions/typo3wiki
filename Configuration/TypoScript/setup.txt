@@ -16,6 +16,13 @@ plugin.tx_typo3wiki {
     }
 }
 
+lib.typo3wiki.header = TEXT
+lib.typo3wiki.header {
+  data = GP:tx_typo3wiki_typo3wiki|page
+  wrap = {$plugin.tx_typo3wiki.settings.header.prefix}{DB:tx_typo3wiki_domain_model_page:|:page_title}{$plugin.tx_typo3wiki.settings.header.suffix}
+  insertData = 1
+}
+
 plugin.tx_typo3wiki._CSS_DEFAULT_STYLE (
 	input.f3-form-error {
 		background-color:#FF9F9F;

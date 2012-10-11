@@ -15,5 +15,12 @@ plugin.tx_typo3wiki {
 		// @todo file is wrong
 		# cat=plugin.tx_typo3wiki/file; type=string; label=Starting Page for Wiki (FE)
 		indexPageTitle = main
+		header = COA
+		header{
+		    prefix = TEXT
+		    prefix =  :
+            suffix = TEXT
+            suffix =
+		}
 	}
 }
