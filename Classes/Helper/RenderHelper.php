@@ -35,25 +35,6 @@
 	class Tx_Typo3wiki_Helper_RenderHelper extends MarkdownExtra_Parser {
 
 		/**
-		 * Method for getting a PageObject by Title. If Object does not exists, it will be created.
-		 *
-		 * @param string $title
-		 * @return Tx_Typo3wiki_Domain_Model_Page
-		 */
-		private function createPageIfNotExists($title){
-			$returnPage = $this->pageRepository->findOneByPageTitle($title);
-			if($returnPage === NULL){
-				$returnPage = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_Page');
-				$returnPage->setPageTitle($title);
-				$this->pageRepository->add($returnPage);
-				$persistenceManager = t3lib_div::makeInstance('Tx_Extbase_Persistence_Manager');
-				$persistenceManager->persistAll();
-			}
-			return $returnPage;
-
-		}
-
-		/**
 		 * relatedPageSearch
 		 *
 		 * @var string
@@ -139,6 +120,25 @@
 			$text = $this->_renderContentList($text);
 			return $text;
 		}
+
+        /**
+         * Method for getting a PageObject by Title. If Object does not exists, it will be created.
+         *
+         * @param string $title
+         * @return Tx_Typo3wiki_Domain_Model_Page
+         */
+        private function createPageIfNotExists($title){
+            $returnPage = $this->pageRepository->findOneByPageTitle($title);
+            if($returnPage === NULL){
+                $returnPage = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_Page');
+                $returnPage->setPageTitle($title);
+                $this->pageRepository->add($returnPage);
+                $persistenceManager = t3lib_div::makeInstance('Tx_Extbase_Persistence_Manager');
+                $persistenceManager->persistAll();
+            }
+            return $returnPage;
+
+        }
 
 		/**
 		 * Removes Cache of Related Categories; Fired on update
@@ -232,14 +232,15 @@
 				}
 
 			}
-
-			foreach($this->helper as $relatedPage){
-				if($relatedPage->getMainRevision() === NULL){
-					if(!$relatedPage->getRelatedPages()->contains($this->relatedPage)){
-						$relatedPage->addRelatedPage($this->relatedPage);
-					}
-				}
-			}
+            if($this->relatedPage !== NULL){
+                foreach($this->helper as $relatedPage){
+                    if($relatedPage->getMainRevision() === NULL){
+                        if(!$relatedPage->getRelatedPages()->contains($this->relatedPage)){
+                            $relatedPage->addRelatedPage($this->relatedPage);
+                        }
+                    }
+                }
+            }
 			$this->helper = NULL;
 			return $text;
 		}
@@ -350,9 +351,11 @@
 			if($cat[0] === '{TOC}') return $cat[0];
 			if($cat[0] === '{LOC}') return $cat[0];
 			$this->helper[1][] = $cat[1];
-			$tmpPage = $this->createPageIfNotExists($cat[1]);
-			if(!$tmpPage->getCategoryPages()->contains($this->relatedPage)) $tmpPage->addCategoryPage($this->relatedPage);
-			if($tmpPage->getIsCategory() === FALSE)     $tmpPage->setIsCategory(TRUE);
+            if($this->relatedPage !== NULL){
+			    $tmpPage = $this->createPageIfNotExists($cat[1]);
+		    	if(!$tmpPage->getCategoryPages()->contains($this->relatedPage)) $tmpPage->addCategoryPage($this->relatedPage);
+			    if($tmpPage->getIsCategory() === FALSE)     $tmpPage->setIsCategory(TRUE);
+            }
 			return '';
 		}
 
@@ -364,10 +367,12 @@
 		 */
 		private function _renderCategoriesList($text){
 			if(strpos($text, '{LOC}') !== FALSE){
-				$tocView = $this->createViewHelper('CategoryList');
-				$tocView->assign('pages', $this->relatedPage->getCategoryPages());
-				$helper = $tocView->render();
-				$text = str_replace('{LOC}', $helper, $text);
+                if($this->relatedPage !== NULL){
+				    $tocView = $this->createViewHelper('CategoryList');
+				    $tocView->assign('pages', $this->relatedPage->getCategoryPages());
+				    $helper = $tocView->render();
+				    $text = str_replace('{LOC}', $helper, $text);
+                }
 			}
 			return $text;
 		}

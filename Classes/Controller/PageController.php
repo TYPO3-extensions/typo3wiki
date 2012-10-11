@@ -110,9 +110,11 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 *
 	 * @param Tx_Typo3wiki_Domain_Model_Page $page
 	 * @dontvalidate $page
+     * @param string $unrenderedText
+     * @dontvalidate $unrenderedText
 	 * @return void
 	 */
-	public function editAction(Tx_Typo3wiki_Domain_Model_Page $page = NULL) {
+	public function editAction(Tx_Typo3wiki_Domain_Model_Page $page = NULL, $unrenderedText = NULL) {
 		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		if($page === NULL){
 			$page = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_Page');
@@ -121,6 +123,12 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 			$persistenceManager = t3lib_div::makeInstance('Tx_Extbase_Persistence_Manager');
 			$persistenceManager->persistAll();
 		}
+        $preview = NULL;
+        if($unrenderedText !== NULL){
+            $renderHelper = $this->createRenderHelper();
+            $preview = $renderHelper->renderText($unrenderedText);
+        }
+        $this->view->assign('preview', $preview);
 		$this->view->assign('page', $page);
 	}
 
@@ -131,10 +139,21 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 * @return void
 	 */
 	public function updateAction(Tx_Typo3wiki_Domain_Model_Page $page) {
-		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
-		$text = $this->request->getArgument('text') ;
+  		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
+		$text = $this->request->getArgument('text');
+        try{
+            $this->request->getArgument('preview');
+            $preview = TRUE;
+        }catch(Exception $e){
+            $preview = FALSE;
+        }
 
-		$revision = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_TextRevision');
+        if(isset($page) && $preview){
+            $this->forward('edit', NULL, NULL, array('page'=>$page, 'unrenderedText'=>$text));
+        }
+
+
+        $revision = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_TextRevision');
 		$revision->setUnrenderedText($text);
 		$revision->setWriteDate(new DateTime('NOW'));
 		$revision->setRenderedText('');

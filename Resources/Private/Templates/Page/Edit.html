@@ -3,12 +3,13 @@
     <h1>Edit Page</h1>
     <f:if condition="{preview}">
         <f:then>
-            <f:render partial="Edit/Preview" arguments="{text:preview}"/>
+            <f:render partial="Page/Preview" arguments="{text:preview}"/>
         </f:then>
     </f:if>
     <h2>{page.pageTitle}</h2>
     <f:form action="update" arguments="{page:page}">
         <f:form.textarea cols="20" rows="5" name="text" value="{page.mainRevision.unrenderedText}" />
         <f:form.submit name="command" value="Save" />
+        <f:form.submit name="preview" value="Preview" />
     </f:form>
 </f:section>
