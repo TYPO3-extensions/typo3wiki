@@ -4,6 +4,19 @@
 		<header/>
 		<body>
 
+
+			<trans-unit id="tx_typo3wiki_plugin_title">
+				<source>TYPO3 Wiki</source>
+			</trans-unit>
+			<trans-unit id="tx_typo3wiki_plugin_desc">
+            	<source>The TYPO3 Wiki Main Plugins Configuration</source>
+            </trans-unit>
+			<trans-unit id="tx_typo3wiki_plugin_switchable_controller_action">
+            	<source>Select Action</source>
+            </trans-unit>
+            <trans-unit id="tx_typo3wiki_plugin_use_main">
+            	<source>Default View</source>
+            </trans-unit>
 			<trans-unit id="tx_typo3wiki_domain_model_page">
 				<source>Page</source>
 			</trans-unit>
