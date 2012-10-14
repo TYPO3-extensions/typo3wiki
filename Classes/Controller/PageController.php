@@ -124,12 +124,16 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 			$persistenceManager->persistAll();
 		}
         $preview = NULL;
+        $myUnrenderedText = '';
+        if($page->getMainRevision() !== NULL) $myUnrenderedText = $page->getMainRevision()->getUnrenderedText();
         if($unrenderedText !== NULL){
             $renderHelper = $this->createRenderHelper();
             $preview = $renderHelper->renderText($unrenderedText);
+            $myUnrenderedText = $unrenderedText;
         }
         $this->view->assign('preview', $preview);
 		$this->view->assign('page', $page);
+        $this->view->assign('unrenderedText', $myUnrenderedText);
 	}
 
 	/**
