@@ -110,11 +110,16 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 *
 	 * @param Tx_Typo3wiki_Domain_Model_Page $page
 	 * @dontvalidate $page
+     *
      * @param string $unrenderedText
      * @dontvalidate $unrenderedText
+     *
+     * @param string $changes
+     * @dontvalidate $changes
+     *
 	 * @return void
 	 */
-	public function editAction(Tx_Typo3wiki_Domain_Model_Page $page = NULL, $unrenderedText = NULL) {
+	public function editAction(Tx_Typo3wiki_Domain_Model_Page $page = NULL, $unrenderedText = NULL, $changes = NULL) {
 		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		if($page === NULL){
 			$page = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_Page');
@@ -132,7 +137,9 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
             $myUnrenderedText = $unrenderedText;
         }
         $this->view->assign('preview', $preview);
-		$this->view->assign('page', $page);
+        var_dump($changes, $_POST);
+        $this->view->assign('changes', $changes);
+        $this->view->assign('page', $page);
         $this->view->assign('unrenderedText', $myUnrenderedText);
 	}
 
@@ -145,6 +152,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	public function updateAction(Tx_Typo3wiki_Domain_Model_Page $page) {
   		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		$text = $this->request->getArgument('text');
+        $changes = $this->request->getArgument('changes');
         try{
             $this->request->getArgument('preview');
             $preview = TRUE;
@@ -153,7 +161,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
         }
 
         if(isset($page) && $preview){
-            $this->forward('edit', NULL, NULL, array('page'=>$page, 'unrenderedText'=>$text));
+            $this->forward('edit', NULL, NULL, array('page' => $page, 'unrenderedText' => $text, 'changes' => $changes));
         }
 
 
@@ -161,6 +169,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 		$revision->setUnrenderedText($text);
 		$revision->setWriteDate(new DateTime('NOW'));
 		$revision->setRenderedText('');
+        $revision->setChanges($changes);
 
 		$redirection = preg_match('/\[\[REDIRECT:(.*)\]\]/i', $text, $matches);
 		if($redirection === 1){
