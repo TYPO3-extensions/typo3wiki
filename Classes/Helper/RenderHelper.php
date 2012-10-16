@@ -205,7 +205,7 @@
 				$linkTitle = explode('|', $linkTitle);
 				if(count($linkTitle)==2){
 					$link = $this->uriBuilder->setArguments(array('tx_typo3wiki_typo3wiki[action]' => 'show', 'tx_typo3wiki_typo3wiki[page]' => $linkTitle[1]));
-					$link = $link->build();
+					$link = $link->buildFrontendUri();
 					$cssClass = 'internal exists';
 					if(!isset($this->helper[$linkTitle[1]])){
 						$target = $this->createPageIfNotExists($linkTitle[1]);
@@ -218,7 +218,7 @@
 					$text = str_replace('[['.$linkTitle[0].'|'.$linkTitle[1].']]', $link, $text);
 				}else{
 					$link = $this->uriBuilder->setArguments(array('tx_typo3wiki_typo3wiki[action]' => 'show', 'tx_typo3wiki_typo3wiki[page]' => $linkTitle[0]));
-					$link = $link->build();
+					$link = $link->buildFrontendUri();
 					$cssClass = 'internal exists';
 					if(!isset($this->helper[$linkTitle[0]])){
 						$target = $this->createPageIfNotExists($linkTitle[0]);
