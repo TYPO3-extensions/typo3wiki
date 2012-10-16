@@ -57,7 +57,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 * @return void
 	 */
 	public function indexAction() {
-		$this->forward('show', NULL, NULL, array('page' => $this->settings['indexPageTitle']));
+		$this->redirect('show', NULL, NULL, array('page' => $this->settings['indexPageTitle']));
 	}
 
 	/**
@@ -68,14 +68,11 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 * @return void
 	 */
 	public function showAction(Tx_Typo3wiki_Domain_Model_Page $page = NULL) {
-		//var_dump($this->request->getArgument('page'), get_class($page));
-		//var_dump($page->getUid());
-		//die();
 		$settings = $this->configurationManager->getConfiguration(Tx_Extbase_Configuration_ConfigurationManagerInterface::CONFIGURATION_TYPE_FRAMEWORK);
 		if($page === NULL ) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		if($page === NULL || $page->getMainRevision() === NULL){
 			if($page === NULL ){
-				$this->request->getArgument('page');
+				$target = $this->request->getArgument('page');
 			}else{
 				$target = $page->getPageTitle();
 			}
@@ -147,7 +144,6 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
             $myUnrenderedText = $unrenderedText;
         }
         $this->view->assign('preview', $preview);
-        var_dump($changes, $_POST);
         $this->view->assign('changes', $changes);
         $this->view->assign('page', $page);
         $this->view->assign('unrenderedText', $myUnrenderedText);
