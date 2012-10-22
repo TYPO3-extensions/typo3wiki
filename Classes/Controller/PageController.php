@@ -57,7 +57,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 * @return void
 	 */
 	public function indexAction() {
-		$this->redirect('show', NULL, NULL, array('page' => $this->settings['indexPageTitle']));
+		$this->forward('show', NULL, NULL, array('page' => $this->settings['indexPageTitle']));
 	}
 
 	/**
@@ -72,7 +72,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 		if($page === NULL ) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		if($page === NULL || $page->getMainRevision() === NULL){
 			if($page === NULL ){
-				$target = $this->request->getArgument('page');
+				$this->request->getArgument('page');
 			}else{
 				$target = $page->getPageTitle();
 			}

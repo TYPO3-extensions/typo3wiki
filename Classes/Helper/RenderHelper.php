@@ -32,6 +32,7 @@
 	 */
 	// @todo order Methods
 	require(__DIR__ . '/markdown.php');
+	require(__DIR__ . '/geshi.php');
 	class Tx_Typo3wiki_Helper_RenderHelper extends MarkdownExtra_Parser {
 
 		/**
@@ -118,6 +119,7 @@
 			$text = $this->_renderInternalLinks($text);
 			$text = $this->_renderHeadlineLinks($text);
 			$text = $this->_renderContentList($text);
+			$text = $this->_renderCodeHighlighting($text);
 			return $text;
 		}
 
@@ -170,7 +172,7 @@
 				$catPage = $this->createPageIfNotExists($cat);
 				if(!$catPage->getCategoryPages()->contains($this->relatedPage)){
 					$catPage->addCategoryPage($this->relatedPage);
-					$catPage->setIsCategory(true);
+					$catPage->setIsCategory(TRUE);
 				}
 				$this->helper[$cat] = TRUE;
 			}
@@ -375,6 +377,30 @@
                 }
 			}
 			return $text;
+		}
+
+		/**
+		 * Method for SyntaxHighlighting
+		 *
+		 * @param string $text
+		 * @return string
+		 */
+		private function _renderCodeHighlighting($text){
+			$text = preg_replace_callback('/<p>LanG:\s*(.*?)<\/p>.*?<pre>.?<code>(.*?)<\/code>.?<\/pre>/ism', array( $this, '_renderCodeHighlighting_Helper'), $text);
+			return $text;
+		}
+
+		/**
+		 * Helper Method for Syntax Highlighting
+		 *
+		 * @param string $text
+		 * @return string
+		 */
+		private function _renderCodeHighlighting_Helper($text){
+			$geshi = new GeSHi(htmlspecialchars_decode($text[2]), $text[1]);
+			$geshi->enable_classes();
+			$geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
+			return '<style type="text/css" scoped="scoped">'.$geshi->get_stylesheet().'</style><pre>'.$geshi->parse_code().'</pre>';
 		}
 
 		/**
