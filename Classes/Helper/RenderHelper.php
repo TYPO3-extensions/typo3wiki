@@ -266,27 +266,29 @@
 		 */
 		private function _renderContentList($text) {
 			if(strpos($text, '{TOC}') === FALSE) return $text;
-			$stageList = $this->_getContentListStage($text, 1);
-			$tocView = $this->createViewHelper('TableOfContents');
-			$tocView->assign('stageList', $stageList);
-			return str_replace('{TOC}', $tocView->render(), $text);
+			$return = $this->_getCurrentLevel($text, 1);
+			return str_replace('{TOC}', $return, $text);
 		}
 
 		/**
-		 * HelperMethod for Rendering ContentList
+		 * Helper Method for _renderContentList doing the magic ( recursivly )
 		 *
-		 * @param string $text
+		 * @param string $string
 		 * @param int $stage
-		 * @return array
+		 * @return string
 		 */
-		private function _getContentListStage($text, $stage){
-			$returnArray = array();
-			if($stage == $this->maxStage) return $returnArray;
-			preg_match_all('/<h'.$stage.'>(.*?)<\/h'.$stage.'>.*?((?:(?!<h'.$stage.'>).)*)/s', $text, $tmp);
-			for($i = 0; $i < count($tmp[1]); $i++){
-				$returnArray[$tmp[1][$i]] = $this->_getContentListStage($tmp[2][$i], $stage+1);
+		private function _getCurrentLevel($string, $stage){
+			$array = explode('<h'.$stage.'>', $string);
+			$return = '';
+			foreach($array as $i => $arrayField) {
+				if($i == 0) continue;
+				$internal_array = explode('</h'.$stage.'>', $arrayField);
+				$return .= '<li>'.$internal_array[0];
+				if($stage != 6) $return .= $this->_getCurrentLevel($internal_array[1], $stage+1);
+				$return .='</li>';
 			}
-			return $returnArray;
+			if($return != '') $return = '<ul>'.$return.'</ul>';
+			return $return;
 		}
 
 		/**
