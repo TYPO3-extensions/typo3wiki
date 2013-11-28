@@ -8,6 +8,6 @@
             <f:link.action action="show" arguments="{page: redirection}">{redirection}</f:link.action>
         </div>
     </f:if>
-    <div class="edit"><f:link.action action="edit" arguments="{page: page}">edit</f:link.action></div>
+    <f:if condition="{allowEdit}"><div class="edit"><f:link.action action="edit" arguments="{page: page}">edit</f:link.action></div></f:if>
     <div class="content"><f:format.raw>{page.mainRevision.renderedText}</f:format.raw></div>
 </f:section>

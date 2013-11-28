@@ -4,7 +4,7 @@
  *  Copyright notice
  *
  *  (c) 2012 Bastian Bringenberg <typo3@bastian-bringenberg.de>, Bastian Bringenberg
- *  
+ *
  *  All rights reserved
  *
  *  This script is part of the TYPO3 project. The TYPO3 project is
@@ -91,6 +91,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 			$renderHelper->setRelatedPage($page);
 			$page->getMainRevision()->setRenderedText($renderHelper->renderText($page->getMainRevision()->getUnrenderedText()));
 		}
+		$this->view->assign('allowEdit', $page->allowEdit($this->settings));
 		$this->view->assign('redirection', $redirection);
 		$this->view->assign('page', $page);
 	}
@@ -135,13 +136,15 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 			$persistenceManager = t3lib_div::makeInstance('Tx_Extbase_Persistence_Manager');
 			$persistenceManager->persistAll();
 		}
+		if(!$page->allowEdit($this->settings)) $this->redirect('show', NULL, NULL, array('page' => $page));
+
         $preview = NULL;
         $myUnrenderedText = '';
-        if($page->getMainRevision() !== NULL) $myUnrenderedText = $page->getMainRevision()->getUnrenderedText();
-        if($unrenderedText !== NULL){
+		if($page->getMainRevision() !== NULL) $myUnrenderedText = $page->getMainRevision()->getUnrenderedText();
+		if($unrenderedText !== NULL){
             $renderHelper = $this->createRenderHelper();
-            $preview = $renderHelper->renderText($unrenderedText);
-            $myUnrenderedText = $unrenderedText;
+			$preview = $renderHelper->renderText($unrenderedText);
+			$myUnrenderedText = $unrenderedText;
         }
         $this->view->assign('preview', $preview);
         $this->view->assign('changes', $changes);
@@ -156,7 +159,8 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 * @return void
 	 */
 	public function updateAction(Tx_Typo3wiki_Domain_Model_Page $page) {
-  		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
+		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
+		if(!$page->allowEdit($this->settings)) $this->redirect('show', NULL, NULL, array('page' => $page));
 		$text = $this->request->getArgument('text');
         $changes = $this->request->getArgument('changes');
         try{
@@ -165,7 +169,6 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
         }catch(Exception $e){
             $preview = FALSE;
         }
-
         if(isset($page) && $preview){
             $this->forward('edit', NULL, NULL, array('page' => $page, 'unrenderedText' => $text, 'changes' => $changes));
         }

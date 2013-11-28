@@ -13,6 +13,9 @@ plugin.tx_typo3wiki {
 	}
 	settings {
     	indexPageTitle = {$plugin.tx_typo3wiki.settings.indexPageTitle}
+    	guestCanEdit = {$plugin.tx_typo3wiki.settings.guestCanEdit}
+        guestCanRead = {$plugin.tx_typo3wiki.settings.guestCanRead}
+        adminGroupID = {$plugin.tx_typo3wiki.settings.adminGroupID}
     }
 }
 

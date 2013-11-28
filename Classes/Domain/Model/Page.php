@@ -117,6 +117,17 @@
 		}
 
 		/**
+		 * Checks if user is allowed to edit page
+		 *
+		 * @param array $settings
+		 * @return boolean
+		 */
+		public function allowEdit($settings) {
+			if(!$settings->guestCanEdit && $GLOBALS['TSFE']->fe_user->user['uid'] == 0) return false;
+			return true;
+		}
+
+		/**
 		 * Returns the pageTitle
 		 *
 		 * @return string $pageTitle
