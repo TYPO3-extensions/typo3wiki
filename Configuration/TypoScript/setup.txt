@@ -45,3 +45,6 @@ plugin.tx_typo3wiki._CSS_DEFAULT_STYLE (
 		vertical-align:top;
 	}
 )
+
+page.includeJS.typo3wiki = EXT:typo3wiki/Resources/Public/JavaScript/typo3wiki.js
+page.includeCSS.typo3wiki = EXT:typo3wiki/Resources/Public/Css/typo3wiki.css

@@ -3,9 +3,11 @@
     <h1>Edit Page</h1>
     <f:if condition="{preview}">
         <f:then>
+        	<h2>{page.pageTitle}</h2>
             <f:render partial="Page/Preview" arguments="{text:preview}"/>
         </f:then>
     </f:if>
+    
     <h2>{page.pageTitle}</h2>
     <f:form action="update" arguments="{page:page}">
         <f:form.textarea cols="20" rows="5" name="text" value="{unrenderedText}" />
@@ -16,4 +18,66 @@
         <f:form.submit name="command" value="Save" />
         <f:form.submit name="preview" value="Preview" />
     </f:form>
+    <div class="tx_typo3wiki_examples">
+    	<span class="tx_typo3wiki_examples_toggle">Example Texts</span>
+    	<div class="tx_typo3wiki_examples_content">
+    		<table class="tx_typo3wiki_examples_table">
+    			<tr>
+    				<th>Bold</th>
+    				<td>**bold text**</td>
+    			</tr>
+    			<tr>
+    				<th>Italic</th>
+    				<td>*underscored text*</td>
+    			</tr>
+    			<tr>
+    				<th>Internal Link</th>
+    				<td>[[PageName]]
+[[My long Title|PageName]]
+    				</td>
+    			</tr>
+    			<tr>
+    				<th>External Link</th>
+    				<td>&lt;http://example.com/&gt;
+[YouTube](http://www.youtube.com)
+    				</td>
+    			</tr>
+    			<tr>
+    				<th>Image</th>
+    				<td>![Alt text](/path/to/img.jpg)</td>
+    			</tr>
+    			<tr>
+    				<th>Headlines</th>
+    				<td># Headline 1
+## Headline 2
+### Headline 3
+#### Headline 4
+##### Headline 5
+    				</td>
+    			</tr>
+    			<tr>
+    				<th>Table of Content</th>
+    				<td>&#x007b;TOC&#x007d;</td>
+    			</tr>
+    			<tr>
+    				<th>Table</th>
+    				<td>First Header  | Second Header
+------------ | -------------
+Content Cell  | Content Cell
+Content Cell  | Content Cell
+    				</td>
+    			</tr>
+    			<tr>
+    				<th>Code</th>
+    				<td>Lang: PHP
+&nbsp;
+&nbsp;&nbsp;&nbsp;&nbsp;&lt;?php
+&nbsp;&nbsp;&nbsp;&nbsp;echo 'As you can __see__ here';
+&nbsp;&nbsp;&nbsp;&nbsp;$return = myCallableFunction($var1, $var2, 'text');
+    				</td>
+    			</tr>
+    		</table>
+    	</div>
+    </div>
+
 </f:section>

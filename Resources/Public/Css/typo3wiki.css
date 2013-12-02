@@ -1,0 +1,27 @@
+span.tx_typo3wiki_examples_toggle {
+	font-size: 0.9em;
+	font-weight: bold;
+	text-align: right;
+	width: 100%;
+	float: right;
+}
+
+span.tx_typo3wiki_examples_toggle:hover {
+	text-decoration: underline;
+}
+
+table.tx_typo3wiki_examples_table {
+	border-collapse: collapse;
+}
+
+table.tx_typo3wiki_examples_table td {
+	white-space: pre;
+	font-family: monospace;
+	display: block;
+	padding: .5em;
+}
+
+table.tx_typo3wiki_examples_table th {
+	vertical-align: top;
+	padding: .5em;
+}
