@@ -25,3 +25,16 @@ table.tx_typo3wiki_examples_table th {
 	vertical-align: top;
 	padding: .5em;
 }
+
+
+div.tx-typo3wiki .floatRight {
+	float: right;
+}
+
+div.tx-typo3wiki .floatLeft {
+	float: left;
+}
+
+div.tx-typo3wiki .clear {
+	clear: both;
+}

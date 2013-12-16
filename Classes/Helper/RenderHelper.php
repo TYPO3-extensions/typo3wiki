@@ -22,17 +22,16 @@
 	 *
 	 *  This copyright notice MUST APPEAR in all copies of the script!
 	 ***************************************************************/
+	require_once(__DIR__ . '/markdown.php');
+	require_once(__DIR__ . '/geshi.php');
 
 	/**
-	 *
+	 * class Tx_Typo3wiki_Helper_RenderHelper
 	 *
 	 * @package typo3wiki
 	 * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
 	 *
 	 */
-	// @todo order Methods
-	require(__DIR__ . '/markdown.php');
-	require(__DIR__ . '/geshi.php');
 	class Tx_Typo3wiki_Helper_RenderHelper extends MarkdownExtra_Parser {
 
 		/**
@@ -119,33 +118,33 @@
 			$text = $this->_renderInternalLinks($text);
 			$text = $this->_renderHeadlineLinks($text);
 			$text = $this->_renderContentList($text);
+			$text = $this->_renderOwnTextBlocks($text);
 			$text = $this->_renderCodeHighlighting($text);
 			return $text;
 		}
 
-        /**
-         * Method for getting a PageObject by Title. If Object does not exists, it will be created.
-         *
-         * @param string $title
-         * @return Tx_Typo3wiki_Domain_Model_Page
-         */
-        private function createPageIfNotExists($title){
-            $returnPage = $this->pageRepository->findOneByPageTitle($title);
-            if($returnPage === NULL){
-                $returnPage = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_Page');
-                $returnPage->setPageTitle($title);
-                $this->pageRepository->add($returnPage);
-                $persistenceManager = t3lib_div::makeInstance('Tx_Extbase_Persistence_Manager');
-                $persistenceManager->persistAll();
-            }
-            return $returnPage;
+		/**
+		 * Method for getting a PageObject by Title. If Object does not exists, it will be created.
+		 *
+		 * @param string $title
+		 * @return Tx_Typo3wiki_Domain_Model_Page
+		 */
+		protected function createPageIfNotExists($title) {
+		$returnPage = $this->pageRepository->findOneByPageTitle($title);
+		if($returnPage === NULL){
+			$returnPage = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_Page');
+			$returnPage->setPageTitle($title);
+			$this->pageRepository->add($returnPage);
+			$persistenceManager = t3lib_div::makeInstance('Tx_Extbase_Persistence_Manager');
+			$persistenceManager->persistAll();
+		}
+		return $returnPage;
 
-        }
+		}
 
 		/**
 		 * Removes Cache of Related Categories; Fired on update
 		 *
-		 * @param Tx_Typo3wiki_Domain_Model_Page $page
 		 * @param string $text
 		 * @return void
 		 */
@@ -161,10 +160,10 @@
 		 * Helper Method for: Removes Cache of Related Categories; Fired on update
 		 * Adds this page to all relatedCategoryPages
 		 *
-		 * @param $cat PageMatching
+		 * @param mixed $cat
 		 * @return mixed
 		 */
-		private function _renderCategoryPagesHelper($cat){
+		protected function _renderCategoryPagesHelper($cat){
 			$cat = $cat[1];
 			if($cat === 'TOC') return '';
 			if($cat === 'LOC') return '';
@@ -182,8 +181,6 @@
 		/**
 		 * Removes Cache of Related Pages, if current pages is new created
 		 *
-		 *
-		 * @param Tx_Typo3wiki_Domain_Model_Page $page
 		 * @return void
 		 */
 		public function renderRelatedPages() {
@@ -199,13 +196,13 @@
 		 * @param string $text
 		 * @return string
 		 */
-		private function _renderInternalLinks($text) {
+		protected function _renderInternalLinks($text) {
 			$this->helper = array();
 			$tmp = array();
 			preg_match_all('#\[\[([^\]]*)\]\]#u', $text, $tmp);
 			foreach($tmp[1] as $linkTitle){
 				$linkTitle = explode('|', $linkTitle);
-				if(count($linkTitle)==2){
+				if(count($linkTitle) == 2){
 					$link = $this->uriBuilder->setArguments(array('tx_typo3wiki_typo3wiki[action]' => 'show', 'tx_typo3wiki_typo3wiki[page]' => $linkTitle[1]));
 					$link = $link->buildFrontendUri();
 					$cssClass = 'internal exists';
@@ -216,8 +213,8 @@
 						$target = $this->helper[$linkTitle[1]];
 					}
 					if($target->getMainRevision() === NULL ) $cssClass = 'internal nonexists';
-					$link = '<a href="'.$link.'" class="'.$cssClass.'">'.$linkTitle[0].'</a>';
-					$text = str_replace('[['.$linkTitle[0].'|'.$linkTitle[1].']]', $link, $text);
+					$link = '<a href="' . $link . '" class="' . $cssClass . '">' . $linkTitle[0] . '</a>';
+					$text = str_replace('[[' . $linkTitle[0] . '|' . $linkTitle[1] . ']]', $link, $text);
 				}else{
 					$link = $this->uriBuilder->setArguments(array('tx_typo3wiki_typo3wiki[action]' => 'show', 'tx_typo3wiki_typo3wiki[page]' => $linkTitle[0]));
 					$link = $link->buildFrontendUri();
@@ -229,20 +226,20 @@
 						$target = $this->helper[$linkTitle[0]];
 					}
 					if( $target->getMainRevision() === NULL ) $cssClass = 'internal nonexists';
-					$link = '<a href="'.$link.'" class="'.$cssClass.'">'.$linkTitle[0].'</a>';
-					$text = str_replace('[['.$linkTitle[0].']]', $link, $text);
+					$link = '<a href="' . $link . '" class="' . $cssClass . '">' . $linkTitle[0] . '</a>';
+					$text = str_replace('[[' . $linkTitle[0] . ']]', $link, $text);
 				}
 
 			}
-            if($this->relatedPage !== NULL){
-                foreach($this->helper as $relatedPage){
-                    if($relatedPage->getMainRevision() === NULL){
-                        if(!$relatedPage->getRelatedPages()->contains($this->relatedPage)){
-                            $relatedPage->addRelatedPage($this->relatedPage);
-                        }
-                    }
-                }
-            }
+			if($this->relatedPage !== NULL){
+				foreach($this->helper as $relatedPage){
+					if($relatedPage->getMainRevision() === NULL){
+						if(!$relatedPage->getRelatedPages()->contains($this->relatedPage)){
+							$relatedPage->addRelatedPage($this->relatedPage);
+						}
+					}
+				}
+			}
 			$this->helper = NULL;
 			return $text;
 		}
@@ -253,7 +250,7 @@
 		 * @param string $text
 		 * @return string
 		 */
-		private function _renderExternalLinks($text) {
+		protected function _renderExternalLinks($text) {
 			$text = preg_replace('/<a href="(.*)"/', '$0 class="external" ', $text);
 			return $text;
 		}
@@ -264,7 +261,7 @@
 		 * @param string $text
 		 * @return string
 		 */
-		private function _renderContentList($text) {
+		protected function _renderContentList($text) {
 			if(strpos($text, '{TOC}') === FALSE) return $text;
 			$return = $this->_getCurrentLevel($text, 1);
 			return str_replace('{TOC}', $return, $text);
@@ -277,17 +274,17 @@
 		 * @param int $stage
 		 * @return string
 		 */
-		private function _getCurrentLevel($string, $stage){
-			$array = explode('<h'.$stage.'>', $string);
+		protected function _getCurrentLevel($string, $stage){
+			$array = explode('<h' . $stage . '>', $string);
 			$return = '';
 			foreach($array as $i => $arrayField) {
 				if($i == 0) continue;
-				$internal_array = explode('</h'.$stage.'>', $arrayField);
-				$return .= '<li>'.$internal_array[0];
-				if($stage != 6) $return .= $this->_getCurrentLevel($internal_array[1], $stage+1);
-				$return .='</li>';
+				$internal_array = explode('</h' . $stage . '>', $arrayField);
+				$return .= '<li>' . $internal_array[0];
+				if($stage != 6) $return .= $this->_getCurrentLevel($internal_array[1], $stage + 1);
+				$return .= '</li>';
 			}
-			if($return != '') $return = '<ul>'.$return.'</ul>';
+			if($return != '') $return = '<ul>' . $return . '</ul>';
 			return $return;
 		}
 
@@ -297,7 +294,7 @@
 		 * @param string $text
 		 * @return string
 		 */
-		private function _renderHeadlineLinks($text){
+		protected function _renderHeadlineLinks($text){
 			$this->helper = array();
 			$text = preg_replace_callback('/<h.>(.*)<\/h.>/', array( $this, '_renderHeadlineLinksCall'), $text);
 			$this->helper = NULL;
@@ -310,7 +307,7 @@
 		 * @param string $header
 		 * @return string
 		 */
-		private function _renderHeadlineLinksCall($header){
+		protected function _renderHeadlineLinksCall($header){
 			preg_match('/<h(.)>/', $header[0], $match);
 			$level = $match[1];
 			$header = $header[1];
@@ -319,11 +316,11 @@
 			$shortTag = str_replace('#', '_', $shortTag);
 			if(isset($this->helper[$header])){
 				$this->helper[$header]++;
-				$shortTag.= $this->helper[$header];
+				$shortTag .= $this->helper[$header];
 			}else{
 				$this->helper[$header] = 0;
 			}
-			$header = '<a name="'.$shortTag.'"></a><h'.$level.'><a href="#'.$shortTag.'">'.$header.'</a></h'.$level.'>';
+			$header = '<a name="' . $shortTag . '"></a><h' . $level . '><a href="#' . $shortTag . '">' . $header . '</a></h' . $level . '>';
 			return $header;
 		}
 
@@ -333,7 +330,7 @@
 		 * @param string $text
 		 * @return string
 		 */
-		private function _renderCategories($text){
+		protected function _renderCategories($text){
 			$this->helper = array();
 			$text = preg_replace_callback('/{(.*?)}/', array( $this, '_renderCategoriesHelper'), $text);
 			$tocView = $this->createViewHelper('PageCategories');
@@ -342,7 +339,7 @@
 			$helper = $tocView->render();
 			$helper = $this->_renderInternalLinks($helper);
 			$this->helper = NULL;
-			return $text.$helper;
+			return $text . $helper;
 		}
 
 		/**
@@ -351,15 +348,15 @@
 		 * @param string $cat
 		 * @return string $cat
 		 */
-		private function _renderCategoriesHelper($cat){
+		protected function _renderCategoriesHelper($cat) {
 			if($cat[0] === '{TOC}') return $cat[0];
 			if($cat[0] === '{LOC}') return $cat[0];
 			$this->helper[1][] = $cat[1];
-            if($this->relatedPage !== NULL){
-			    $tmpPage = $this->createPageIfNotExists($cat[1]);
-		    	if(!$tmpPage->getCategoryPages()->contains($this->relatedPage)) $tmpPage->addCategoryPage($this->relatedPage);
-			    if($tmpPage->getIsCategory() === FALSE)     $tmpPage->setIsCategory(TRUE);
-            }
+			if($this->relatedPage !== NULL){
+				$tmpPage = $this->createPageIfNotExists($cat[1]);
+				if(!$tmpPage->getCategoryPages()->contains($this->relatedPage)) $tmpPage->addCategoryPage($this->relatedPage);
+				if($tmpPage->getIsCategory() === FALSE)     $tmpPage->setIsCategory(TRUE);
+			}
 			return '';
 		}
 
@@ -369,14 +366,14 @@
 		 * @param string $text
 		 * @return string $text
 		 */
-		private function _renderCategoriesList($text){
+		protected function _renderCategoriesList($text) {
 			if(strpos($text, '{LOC}') !== FALSE){
-                if($this->relatedPage !== NULL){
-				    $tocView = $this->createViewHelper('CategoryList');
-				    $tocView->assign('pages', $this->relatedPage->getCategoryPages());
-				    $helper = $tocView->render();
-				    $text = str_replace('{LOC}', $helper, $text);
-                }
+				if($this->relatedPage !== NULL){
+					$tocView = $this->createViewHelper('CategoryList');
+					$tocView->assign('pages', $this->relatedPage->getCategoryPages());
+					$helper = $tocView->render();
+					$text = str_replace('{LOC}', $helper, $text);
+				}
 			}
 			return $text;
 		}
@@ -387,9 +384,29 @@
 		 * @param string $text
 		 * @return string
 		 */
-		private function _renderCodeHighlighting($text){
+		protected function _renderCodeHighlighting($text) {
 			$text = preg_replace_callback('/<p>LanG:\s*(.*?)<\/p>.*?<pre>.?<code>(.*?)<\/code>.?<\/pre>/ism', array( $this, '_renderCodeHighlighting_Helper'), $text);
 			return $text;
+		}
+
+		/**
+		 * Method for renderingOwnTextBlocks
+		 *
+		 * Usage:
+		 * !!! myClass
+		 * hey ho
+		 * !!!
+		 *
+		 * Will be rendered as:
+		 * <div class="myClass">
+		 * hey ho
+		 * </div>
+		 *
+		 * @param string $text
+		 * @return string
+		 */
+		protected function _renderOwnTextBlocks($text) {
+			return preg_replace('/!!!\s*?(\w*?)\\n(.*?)\\n!!!/m', '<div class="$1">$2</div>', $text);
 		}
 
 		/**
@@ -398,11 +415,11 @@
 		 * @param string $text
 		 * @return string
 		 */
-		private function _renderCodeHighlighting_Helper($text){
+		protected function _renderCodeHighlighting_Helper($text){
 			$geshi = new GeSHi(htmlspecialchars_decode($text[2]), $text[1]);
 			$geshi->enable_classes();
 			$geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
-			return '<style type="text/css" scoped="scoped">'.$geshi->get_stylesheet().'</style><pre>'.$geshi->parse_code().'</pre>';
+			return '<style type="text/css" scoped="scoped">' . $geshi->get_stylesheet() . '</style><pre>' . $geshi->parse_code() . '</pre>';
 		}
 
 		/**
@@ -411,12 +428,12 @@
 		 * @param string $templateName
 		 * @return Tx_Fluid_View_StandaloneView
 		 */
-		private function createViewHelper($templateName){
+		protected function createViewHelper($templateName){
 			$tocView = $this->objectManager->create('Tx_Fluid_View_StandaloneView');
 			$tocView->setFormat('html');
 			$tocView->setLayoutRootPath(t3lib_div::getFileAbsFileName($this->objectSettings['view']['layoutRootPath']));
 			$tocView->setPartialRootPath(t3lib_div::getFileAbsFileName($this->objectSettings['view']['partialRootPath']));
-			$tocView->setTemplatePathAndFilename(t3lib_div::getFileAbsFileName($this->objectSettings['view']['templateRootPath']).'Rendering/'.$templateName.'.html');
+			$tocView->setTemplatePathAndFilename(t3lib_div::getFileAbsFileName($this->objectSettings['view']['templateRootPath']) . 'Rendering/' . $templateName . '.html');
 			return $tocView;
 		}
 
@@ -424,6 +441,7 @@
 		 *  Set Page Repository
 		 *
 		 * @param \Tx_Typo3wiki_Domain_Repository_PageRepository $pageRepository
+		 * @return void
 		 */
 		public function setPageRepository($pageRepository) {
 			$this->pageRepository = $pageRepository;
@@ -442,6 +460,7 @@
 		 * Set Uri Builder
 		 *
 		 * @param Tx_Extbase_MVC_Web_Routing_UriBuilder $uriBuilder
+		 * @return void
 		 */
 		public function setUriBuilder($uriBuilder) {
 			$this->uriBuilder = $uriBuilder;
@@ -460,6 +479,7 @@
 		 * Set Settings
 		 *
 		 * @param array $settings
+		 * @return void
 		 */
 		public function setSettings($settings) {
 			$this->settings = $settings;
@@ -478,6 +498,7 @@
 		 * Set objectSettings
 		 *
 		 * @param array $objectSettings
+		 * @return void
 		 */
 		public function setObjectSettings($objectSettings) {
 			$this->objectSettings = $objectSettings;
@@ -497,6 +518,7 @@
 		 * Set ObjectManager
 		 *
 		 * @param \Tx_Extbase_Object_ObjectManagerInterface $objectManager
+		 * @return void
 		 */
 		public function setObjectManager($objectManager) {
 			$this->objectManager = $objectManager;
@@ -512,13 +534,18 @@
 		}
 
 		/**
+		 * function setRelatedPage
+		 *
 		 * @param Tx_Typo3wiki_Domain_Model_Page $relatedPage
+		 * @return void
 		 */
 		public function setRelatedPage($relatedPage) {
 			$this->relatedPage = $relatedPage;
 		}
 
 		/**
+		 * function getRelatedPage
+		 *
 		 * @return Tx_Typo3wiki_Domain_Model_Page
 		 */
 		public function getRelatedPage() {
