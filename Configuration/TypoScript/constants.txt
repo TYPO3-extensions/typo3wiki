@@ -6,6 +6,8 @@ plugin.tx_typo3wiki {
 		partialRootPath = EXT:typo3wiki/Resources/Private/Partials/
 		# cat=plugin.tx_typo3wiki/file; type=string; label=Path to template layouts (FE)
 		layoutRootPath = EXT:typo3wiki/Resources/Private/Layouts/
+		# cat=plugin.tx_typo3wiki/file; type=string; label=Default Pid for View
+		defaultPid = 0
 	}
 	persistence {
 		# cat=plugin.tx_typo3wiki//a; type=string; label=Default storage PID

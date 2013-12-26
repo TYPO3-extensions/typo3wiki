@@ -3,6 +3,7 @@ plugin.tx_typo3wiki {
 		templateRootPath = {$plugin.tx_typo3wiki.view.templateRootPath}
 		partialRootPath = {$plugin.tx_typo3wiki.view.partialRootPath}
 		layoutRootPath = {$plugin.tx_typo3wiki.view.layoutRootPath}
+		defaultPid = {$plugin.tx_typo3wiki.view.defaultPid}
 	}
 	persistence {
 		storagePid = {$plugin.tx_typo3wiki.persistence.storagePid}

@@ -15,7 +15,7 @@
                                 <items type="array">
                                     <numIndex index="0" type="array">
                                         <numIndex index="0">LLL:EXT:typo3wiki/Resources/Private/Language/locallang_db.xlf:tx_typo3wiki_plugin_use_main</numIndex>
-                                        <numIndex index="1">Page->index;Page->show;Page->unknownPage;Page->edit;Page->update;Page->searchbox',</numIndex>
+                                        <numIndex index="1">Page->index;Page->show;Page->unknownPage;Page->edit;Page->update;Page->searchbox</numIndex>
                                     </numIndex>
                                 </items>
                             </config>

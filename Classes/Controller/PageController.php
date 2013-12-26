@@ -25,13 +25,12 @@
  ***************************************************************/
 
 /**
- *
+ * class Tx_Typo3wiki_Controller_PageController
  *
  * @package typo3wiki
  * @license http://www.gnu.org/licenses/gpl.html GNU General Public License, version 3 or later
  *
  */
-// @todo implement User to System
 class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_ActionController {
 
 	/**
@@ -57,7 +56,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 * @return void
 	 */
 	public function indexAction() {
-		$this->forward('show', NULL, NULL, array('page' => $this->settings['indexPageTitle']));
+		$this->redirect('show', NULL, NULL, array('page' => $this->settings['indexPageTitle']));
 	}
 
 	/**
@@ -72,7 +71,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 		if($page === NULL ) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		if($page === NULL || $page->getMainRevision() === NULL){
 			if($page === NULL ){
-				$this->request->getArgument('page');
+				$target = $this->request->getArgument('page');
 			}else{
 				$target = $page->getPageTitle();
 			}
@@ -101,8 +100,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 *
 	 * @param Tx_Typo3wiki_Domain_Model_Page $page
 	 * @dontvalidate $page
-	 *
-	 * @return vpid
+	 * @return void
 	 */
 	public function unknownPageAction(Tx_Typo3wiki_Domain_Model_Page $page = NULL){
 		if($page === NULL){
@@ -117,15 +115,12 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 * action edit
 	 *
 	 * @param Tx_Typo3wiki_Domain_Model_Page $page
-	 * @dontvalidate $page
-     *
-     * @param string $unrenderedText
-     * @dontvalidate $unrenderedText
-     *
-     * @param string $changes
-     * @dontvalidate $changes
-     *
+	 * @param mixed $unrenderedText
+	 * @param mixed $changes
 	 * @return void
+	 * @dontvalidate $page
+	 * @dontvalidate $unrenderedText
+	 * @dontvalidate $changes
 	 */
 	public function editAction(Tx_Typo3wiki_Domain_Model_Page $page = NULL, $unrenderedText = NULL, $changes = NULL) {
 		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
@@ -138,18 +133,18 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 		}
 		if(!$page->allowEdit($this->settings)) $this->redirect('show', NULL, NULL, array('page' => $page));
 
-        $preview = NULL;
-        $myUnrenderedText = '';
+		$preview = NULL;
+		$myUnrenderedText = '';
 		if($page->getMainRevision() !== NULL) $myUnrenderedText = $page->getMainRevision()->getUnrenderedText();
 		if($unrenderedText !== NULL){
-            $renderHelper = $this->createRenderHelper();
+			$renderHelper = $this->createRenderHelper();
 			$preview = $renderHelper->renderText($unrenderedText);
 			$myUnrenderedText = $unrenderedText;
-        }
-        $this->view->assign('preview', $preview);
-        $this->view->assign('changes', $changes);
-        $this->view->assign('page', $page);
-        $this->view->assign('unrenderedText', $myUnrenderedText);
+		}
+		$this->view->assign('preview', $preview);
+		$this->view->assign('changes', $changes);
+		$this->view->assign('page', $page);
+		$this->view->assign('unrenderedText', $myUnrenderedText);
 	}
 
 	/**
@@ -162,23 +157,23 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 		if($page === NULL) $page = $this->pageRepository->findOneByPageTitle($this->request->getArgument('page'));
 		if(!$page->allowEdit($this->settings)) $this->redirect('show', NULL, NULL, array('page' => $page));
 		$text = $this->request->getArgument('text');
-        $changes = $this->request->getArgument('changes');
-        try{
-            $this->request->getArgument('preview');
-            $preview = TRUE;
-        }catch(Exception $e){
-            $preview = FALSE;
-        }
-        if(isset($page) && $preview){
-            $this->forward('edit', NULL, NULL, array('page' => $page, 'unrenderedText' => $text, 'changes' => $changes));
-        }
+		$changes = $this->request->getArgument('changes');
+		try{
+			$this->request->getArgument('preview');
+			$preview = TRUE;
+		}catch(Exception $e){
+			$preview = FALSE;
+		}
+		if(isset($page) && $preview){
+			$this->forward('edit', NULL, NULL, array('page' => $page, 'unrenderedText' => $text, 'changes' => $changes));
+		}
 
 
-        $revision = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_TextRevision');
+		$revision = $this->objectManager->get('Tx_Typo3wiki_Domain_Model_TextRevision');
 		$revision->setUnrenderedText($text);
 		$revision->setWriteDate(new DateTime('NOW'));
 		$revision->setRenderedText('');
-        $revision->setChanges($changes);
+		$revision->setChanges($changes);
 
 		$redirection = preg_match('/\[\[REDIRECT:(.*)\]\]/i', $text, $matches);
 		if($redirection === 1){
@@ -232,7 +227,7 @@ class Tx_Typo3wiki_Controller_PageController extends Tx_Extbase_MVC_Controller_A
 	 */
 	private function checkCategoryAssociation(Tx_Typo3wiki_Domain_Model_Page $page){
 		foreach($page->getCategoryPages() as $catPage){
-			if($catPage->getMainRevision() !== NULL && FALSE === strpos($catPage->getMainRevision()->getUnrenderedText(),'{'.$page->getPageTitle().'}')){
+			if($catPage->getMainRevision() !== NULL && FALSE === strpos($catPage->getMainRevision()->getUnrenderedText(),'{' . $page->getPageTitle() . '}')){
 				$page->removeCategoryPage($catPage);
 			}
 		}
