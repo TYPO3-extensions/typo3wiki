@@ -58,7 +58,7 @@ class Tx_Typo3wiki_Service_GoogleSitemapService implements Tx_GoogleServices_Int
 		foreach($founds as $found) {
 			$uriBuilder = $obj->getUriBuilder();
 			$uriBuilder->setTargetPageUid($pid);
-			$url = $uriBuilder->uriFor('show', array('page' => $found->getPageTitle()), 'Page', 'tx_typo3wiki', 'Typo3wiki');
+			$url = $uriBuilder->uriFor('show', array('page' => $found->getPageTitle()), 'Page', 'typo3wiki', 'Typo3wiki');
 			if ($url === '') {
 				continue;
 			}
